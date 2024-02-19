@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
 
@@ -20,7 +21,7 @@ func main() {
 
 	subscribers := []Subscriber{}
 
-	for i := 0; i < 1_000; i++ {
+	for i := 0; i < 100; i++ {
 		c := NewClient()
 		err := c.Connect(n0)
 		if err != nil {
@@ -74,4 +75,5 @@ func main() {
 	}()
 
 	<-done
+
 }

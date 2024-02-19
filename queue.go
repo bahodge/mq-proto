@@ -25,6 +25,7 @@ func (q *queue[T]) Push(element T) {
 
 func NewQueue[T any]() Queue[T] {
 	return &queue[T]{
+		// TODO: Convert the slice into a fixed array
 		contents:     make([]T, 0, initialQueueCapacity),
 		queueCap:     initialQueueCapacity,
 		currentIndex: 0,
@@ -33,6 +34,7 @@ func NewQueue[T any]() Queue[T] {
 
 func NewQueueCap[T any](queueCap int) Queue[T] {
 	return &queue[T]{
+		// TODO: Convert the slice into a fixed array
 		contents:     make([]T, 0, queueCap),
 		queueCap:     queueCap,
 		currentIndex: 0,
@@ -43,15 +45,13 @@ func (q queue[T]) Peek() T {
 	return q.contents[q.currentIndex]
 }
 
-var idxResetCount int
+var idxResetCount int = 0
 
 func (q *queue[T]) Next() T {
 	item := q.contents[q.currentIndex]
 	if q.currentIndex+1 == q.queueCap {
 		q.currentIndex = 0
 		idxResetCount++
-
-		// fmt.Println("resetting idx", idxResetCount)
 	} else {
 		q.currentIndex++
 	}
