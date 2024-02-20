@@ -21,7 +21,7 @@ func main() {
 
 	subscribers := []Subscriber{}
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10_000; i++ {
 		c := NewClient()
 		err := c.Connect(n0)
 		if err != nil {
@@ -46,30 +46,34 @@ func main() {
 
 	done := make(chan struct{})
 	go func() {
-		for i := 0; i < 25; i++ {
+		i := 0
+		for {
 			select {
 			case sig := <-interrupt:
 				slog.Info("received signal interrupt", "signal", sig)
 				done <- struct{}{}
 				return
 			default:
-				start := time.Now()
-				for i := 0; i < 100_000; i++ {
+				if i < 25 {
+					start := time.Now()
+					for i := 0; i < 1_000; i++ {
 
-					err := c0.Publish("/test", &Message{
-						SenderId: c0.Id(),
-						Topic:    "/test",
-						Data:     []byte("hello from c0"),
-					})
+						err := c0.Publish("/test", &Message{
+							SenderId: c0.Id(),
+							Topic:    "/test",
+							Data:     []byte("hello from c0"),
+						})
 
-					if err != nil {
-						log.Fatalf("error: %s", err.Error())
+						if err != nil {
+							log.Fatalf("error: %s", err.Error())
+						}
 					}
+
+					dur := time.Since(start)
+
+					fmt.Println("took", dur)
+					i++
 				}
-
-				dur := time.Since(start)
-
-				fmt.Println("took", dur)
 			}
 		}
 	}()
