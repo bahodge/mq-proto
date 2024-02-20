@@ -21,7 +21,7 @@ func main() {
 
 	subscribers := []Subscriber{}
 
-	for i := 0; i < 10_000; i++ {
+	for i := 0; i < 1; i++ {
 		c := NewClient()
 		err := c.Connect(n0)
 		if err != nil {
@@ -41,11 +41,13 @@ func main() {
 		for _, sub := range subscribers {
 			sub.Close()
 		}
-
 	}()
+
+	// pool := pond.New(10, 1000)
 
 	done := make(chan struct{})
 	go func() {
+		// defer pool.StopAndWait()
 		i := 0
 		for {
 			select {
@@ -54,10 +56,10 @@ func main() {
 				done <- struct{}{}
 				return
 			default:
-				if i < 25 {
+				if i < 100 {
 					start := time.Now()
-					for i := 0; i < 1_000; i++ {
-
+					for i := 0; i < 5_000_000; i++ {
+						// pool.Submit(func() {
 						err := c0.Publish("/test", &Message{
 							SenderId: c0.Id(),
 							Topic:    "/test",
@@ -67,6 +69,8 @@ func main() {
 						if err != nil {
 							log.Fatalf("error: %s", err.Error())
 						}
+						// })
+
 					}
 
 					dur := time.Since(start)
@@ -74,6 +78,7 @@ func main() {
 					fmt.Println("took", dur)
 					i++
 				}
+
 			}
 		}
 	}()
